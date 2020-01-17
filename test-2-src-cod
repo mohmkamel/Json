@@ -1,8 +1,0 @@
-[
-  {
-    'repeat(21, 0)': {
-      _id: '{{objectId()}}',items: '{{items().toUpperCase()}}'
-      },
-      
-  }
-]

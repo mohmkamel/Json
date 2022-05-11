@@ -1,17 +1,3 @@
-use newphar
---select PID , P_Name , UOM , QTY from Pitems
---where --Qty is not null
---UOM is null
-
---select * from PItems PIT
---inner join P_sheet PS
---on PIT.P_name = PS.name 
---where --PIT.qty is not null
-
---select count(*) from Pitems
-
-
-
 insert into PurInv_items (PID , itm_Qty , Expr_date , Sell_pric)
 select P.PID , case when E_date_1 is null then P.qty
 				else  floor (P.qty/2) end  as qty, 

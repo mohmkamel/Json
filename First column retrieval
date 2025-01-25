@@ -1,0 +1,68 @@
+-- ================================================
+-- Template generated from Template Explorer using:
+-- Create Procedure (New Menu).SQL
+-- ================================================
+USE [Job_App]
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+CREATE PROCEDURE [dbo].[Sel_Frst_Col]
+	-- Add the parameters for the stored procedure here
+	@TblName varchar(max) = 0, 
+	@NumCol int = 1
+AS
+BEGIN
+	SET NOCOUNT ON;
+	select * from sys.columns
+	select * from sys.tables
+	select * from Job_App..email
+	
+	/* retrieving obj. id of the required table */
+	declare @obj_id int , @max_col_id int, @C varchar(max),@E int, @Qry_req_cols varchar(max),
+	@Qry varchar(max);
+	
+	select @obj_id = object_id from sys.tables where sys.tables.name = @TblName
+	select @max_col_id = max(column_id) from sys.columns
+	where object_id = @obj_id
+	
+	/* retrieving the col_num with the object id "can be done also with count" */
+	--select top 1  @max_col_id , t1.object_id, t2.name
+	--from sys.columns t1
+	--inner join sys.tables t2
+	--on t1.object_id = t2.object_id
+	--where t1.object_id = @obj_id 
+	/* retrieving columns names and their order with their related table name and obj_id*/
+	--select column_id,t1.name, t1.object_id, t2.name
+	--from sys.columns t1
+	--inner join sys.tables t2
+	--on t1.object_id = t2.object_id
+	--where t1.object_id = @obj_id and column_id <= @NumCol --number of first columns required
+	/* a cursor to iterate the columns needed*/
+	declare crsor cursor for
+			select t1.name,column_id
+			from sys.columns t1
+			inner join sys.tables t2
+			on t1.object_id = t2.object_id
+			where t1.object_id = @obj_id and column_id <= @NumCol
+		open crsor
+		fetch next from crsor into @C,@E
+		while @@fetch_status = 0
+			begin
+	/*if statement to assign values to @Qry_req_cols considering the comma and first value of it*/
+			if @Qry_req_cols is null
+				set	@Qry_req_cols = @C 
+			else
+				set	@Qry_req_cols = @Qry_req_cols + ',' + @C
+				fetch next from crsor into @C,@E
+			end
+		close crsor
+	deallocate crsor
+	--select @Qry_req_cols
+	
+	set @Qry = 'select ' + @Qry_req_cols + ' from ' + @TblName
+	exec (@Qry)
+
+END
+GO
